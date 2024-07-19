@@ -37,12 +37,20 @@ This is a property defining the Artifact ID for the new project. The Artifact ID
 my-app: This is the value of the Artifact ID. It's the name of your project and will also be used as the name of the directory where your project files will be created.
 
 
-#### 3- Add Spring Core dependancies
-i- Open Maven repository.
-ii- Search for Spring context.
-iii- Choose the version you want.
-v- Copy Maven XML tag and paste it in pom.xml file.
- ![alt text](image.png)
+#### 3. Add Spring Core Dependencies
+
+1. **Open Maven Repository**: Visit the Maven repository website (e.g., [Maven Central](https://search.maven.org/)).
+
+2. **Search for Spring Context**: Use the search feature to find the Spring Context dependency.
+
+3. **Choose the Version You Want**: Select the appropriate version for your project.
+
+4. **Copy Maven XML Tag**: Copy the Maven XML dependency tag for Spring Context.
+
+5. **Paste it in `pom.xml` File**: Add the copied XML tag to the `<dependencies>` section of your `pom.xml` file.
+
+![alt text](image.png)
+
  
 ```xml
 <!-- https://mvnrepository.com/artifact/org.springframework/spring-core -->
