@@ -182,7 +182,7 @@ First you must include another plugin
             </configuration>
         </plugin>
 ```
-To make you use the below command
+- To make you use the below command
 ```bash
 mvn exec:java 
 ```
