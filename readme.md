@@ -62,6 +62,7 @@ my-app: This is the value of the Artifact ID. It's the name of your project and 
 </dependency>
 ```
 Why add spring-context not spring core ?
+
 ![alt text](image-1.png)
 
 The `spring-context` module builds on top of `spring-core` and provides more advanced features that are commonly used in enterprise applications.
