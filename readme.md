@@ -170,7 +170,7 @@ so Maven will work with its default JDK.
 ```
 - Done :+1:
 ![alt text](image-5.png)
--To run Maven app 
+- To run Maven app 
 First you must include another plugin
 ```xml
  <plugin>
