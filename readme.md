@@ -1,4 +1,4 @@
-<div style="text-align: center;">
+<div style="text-align: center; width:100%; display:flex; align-items: center; justify-content: center;">
   <img src="image-2.png" alt="alt text" />
 </div>
 
