@@ -1,5 +1,7 @@
 <div style="text-align: center; width:100%; display:flex; align-items: center; justify-content: center;">
   <img src="image-2.png" alt="alt text" />
+  <img style="width:15%" src="Untitled design.png" alt="alt text" />
+
 </div>
 
 # Spring Core
@@ -354,3 +356,103 @@ System.out.println(emailService1 == emailService2); // Output: false
 ### 6. WebSocket (specific to web-aware Spring ApplicationContexts)
 
 ### 7. Custom Scope
+
+______________________________________________
+
+## Spring Bean Scopes (via annotation)
+- There are three ways to ask IoC container to instanciate your beans (object). We talked before about xml, AppConfig. Now we will talk about annotation -the third way- to ask IoC container -ApplicationContext- to instanciate your beans. 
+- Annotation is added in `Spring 2.5.x` while AppConfig is added in `Spring 3.x.x`
+
+- But Actually we have two ways not three, as we can not use annotation without AppConfig or xml.
+
+### 1- Add @Component annotation at the class you want it be instanciated.
+
+```java
+@Component
+public class SMSService {
+    public void sendMessage(String reciever, String message){
+        System.out.println(message + "is being" + reciever);
+    }
+}
+```
+### 2- Add @ComponentScan for config class
+```java
+@Configuration
+//! Component Scan take array of packages to scan them and when find @Component there it will instanciate this class
+//! It helps spring not to scan all packages
+@ComponentScan({"com.example.Annotations"})
+public class MyAppConfig {
+    
+}
+```
+- It is very helpful for spring instead scan all package, spring will only scan this package and manage beans for class that is annotated only with @Component annotation
+
+### 3- Instanciate Bean using IoC container
+
+```java
+ApplicationContext context = new AnnotationConfigApplicationContext(MyAppConfig.class);
+        SMSService smsService =  context.getBean(SMSService.class);
+        smsService.sendMessage("ay", "7aga");
+```
+- If you want retrieve by name like that 
+
+```java
+        SMSService smsService =  context.getBean("myCustomService",SMSService.class);
+```
+
+- You must go to component and identify this custom name
+
+```java
+      @Component("myCustomService")
+      public class SMSService {
+          public void sendMessage(String reciever, String message){
+              System.out.println(message + "is being" + reciever);
+          }
+      }
+```
+
+- Or you can use default name for class name.
+
+### 4- Usng xml instead of AppConfig
+- To achieve **Component Based Annotation** using xml 
+Use NameSpace Declaration `xmlns:context`
+for Schema Location `"http://www.springframework.org/schema/context"`
+
+Modifiy Schema location for Namespace `xsi:schemaLocation` as shown below
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+    https://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/context
+    https://www.springframework.org/schema/context/spring-context.xsd">
+
+  <context:component-scan base-package="com.example.Annotations"/>
+</beans>
+```
+### 5- you can instanciate your context
+ 
+ ```java
+         ApplicationContext context2 = new ClassPathXmlApplicationContext("spring-annotations.xml");
+ ```
+
+## Component Based Annotaions
+![alt text](image-8.png)
+
+- If you start your application, spring will try to instinciate beans for classes that is annotated with those annotations.
+
+- **@Controller** If you anotate with @Controller, that means you will have method anotated with @GetMapp. (Presenation layer)
+
+- **@Service** It deos not add extra functionality like @Controller `@GetMapping` method instead it is a declarative for developer that we are in service layer.
+
+- **@Repository** DAO layer. That class using in `Connect database` or `Making crud operations`. It is add extra functionality
+
+- It will convert those different exceptions thrown by different vendors `SQL Server` or `Oracle` like `Primary Key is duplicate` to be generic one 
+
+- **RestController** When using rest controller
+
+
+## Spring Bean Lifecycle (Creation)
