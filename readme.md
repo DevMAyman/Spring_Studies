@@ -196,3 +196,161 @@ First you must include another plugin
 mvn exec:java 
 ```
 - Take care in mainClass tag you must add your main class path.
+
+
+##  Configration Class
+#### Instead Using xml to tell maven which object type and config i want to instanciate you can use configuration class.
+
+- Add AppConfig class inside Config package.
+![alt text](image-6.png)
+- Add @Configuration annotation
+```java
+package com.example.Config;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+import com.example.EmailService;
+
+@Configuration
+public class AppConfig {
+    
+
+    @Bean
+    public EmailService emailService(){
+        return new EmailService();
+    }
+
+}
+```
+- In main class how get your bean from BeanFactory or ApplicationContext
+
+![alt text](image-7.png)
+
+
+__________________________________________________________________________________________________
+
+
+## Spring Bean Scopes
+
+### Overview
+
+Spring provides different scopes for defining the lifecycle and visibility of beans. Here are the six scopes available:
+
+1. **Singleton (default)**
+2. **Prototype (Per instance per bean request)**
+3. **Request (specific to web-aware Spring ApplicationContexts)**
+4. **Session (specific to web-aware Spring ApplicationContexts)**
+5. **Application (specific to web-aware Spring ApplicationContexts)**
+6. **WebSocket (specific to web-aware Spring ApplicationContexts)**
+
+### 1. Singleton (default)
+
+- **Definition**: A `single instance` of the bean is created for the entire Spring container. This instance is shared and reused wherever it is needed.
+- **Lifecycle**: The bean is instantiated when the Spring container is created, and it is destroyed when the container is destroyed.
+
+**Example:**
+
+In `spring.xml`:
+```xml
+<bean id="emailService" class="com.example.EmailService"></bean>
+```
+
+Create two `ApplicationContext` instances:
+```java
+ApplicationContext ctx1 = new ClassPathXmlApplicationContext("spring.xml");
+ApplicationContext ctx2 = new ClassPathXmlApplicationContext("spring.xml");
+
+EmailService emailService1 = ctx1.getBean("emailService", EmailService.class);
+EmailService emailService2 = ctx2.getBean("emailService", EmailService.class);
+
+// There are two different instances of the application contexts
+```
+
+### 2. Prototype (Per instance per bean request)
+
+- **Definition**: A new instance of the bean is created each time it is requested from the Spring container.
+- **Lifecycle**: The bean is instantiated every time it is requested. Spring does not manage the lifecycle of prototype beans after creation.
+
+**Example:**
+
+**i. XML Configuration:**
+```xml
+<bean id="myPrototypeBean" class="com.example.MyPrototypeBean" scope="prototype" />
+```
+
+**ii. Configuration Class:**
+```java
+@Bean
+@Scope("prototype")
+public MyPrototypeBean myPrototypeBean() {
+    return new MyPrototypeBean();
+}
+```
+
+### When to Use
+
+- **Singleton**: Suitable for stateless beans and shared resources.
+- **Prototype**: Suitable for stateful beans, where different instances are required for different clients.
+
+Understanding these scopes is crucial for designing your application with the appropriate lifecycle and performance considerations in mind.
+
+
+In summary if you make that 
+```java
+ApplicationContext context = new ClassPathXmlApplicationContext("spring.xml");
+        EmailService emailService = context.getBean("myBean", EmailService.class);
+        EmailService emailService3 = context.getBean("myBean", EmailService.class);
+        System.out.println(emailService == emailService3);
+```
+output will be true, that is mean it exist only one instance from my bean even if i call get bean it will make another reference to the the same object.
+while
+```java
+@Configuration
+public class AppConfig {
+    
+
+    @Bean
+    public EmailService emailService(){
+        return new EmailService();
+    }
+
+     @Bean
+        @Scope("prototype")
+    public EmailService emailServiceTwo(){
+        return new EmailService();
+    }
+
+}
+```
+```java
+ApplicationContext context2 = new AnnotationConfigApplicationContext(AppConfig.class);
+        EmailService emailService5 = context2.getBean("emailServiceTwo", EmailService.class);
+        EmailService emailService6 = context2.getBean("emailServiceTwo", EmailService.class);
+```
+output will be false, so foreach call BeansFactory throw another object.
+
+### 3. Request (specific to web-aware Spring ApplicationContexts)
+- It means that this type of bean scope aware abot web (HTTP request) so for each request will create another object.
+- **Definition**: A `single instance` of the bean is created for the entire Spring container. This instance is shared and reused wherever it is needed.
+- **Lifecycle**: The bean is instantiated when the Spring container is created, and it is destroyed when the container is destroyed.
+
+### 4. Session (specific to web-aware Spring ApplicationContexts)
+- Per instance per HTTP session.
+
+### 5. Application (specific to web-aware Spring ApplicationContexts)
+- Per instance per Servlet Context.
+- In one web application you have only one ServletContext but in one web application you might have multiple ApplicationContext
+```java
+ApplicationContext ctx1 = new ClassPathXmlApplicationContext("spring.xml");
+ApplicationContext ctx2 = new ClassPathXmlApplicationContext("spring.xml");
+
+EmailService emailService1 = ctx1.getBean("emailService", EmailService.class);
+EmailService emailService2 = ctx2.getBean("emailService", EmailService.class);
+
+System.out.println(emailService1 == emailService2); // Output: false
+```
+
+### 6. WebSocket (specific to web-aware Spring ApplicationContexts)
+
+### 7. Custom Scope
