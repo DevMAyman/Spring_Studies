@@ -6,6 +6,11 @@
 		https://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/aop
 		https://www.springframework.org/schema/aop/spring-aop.xsd">
-    <bean id="myBean" class="com.example.EmailService"></bean>
+    <!-- <bean id="myBean" class="com.example.EmailService"></bean> -->
+    <!-- <bean id="cust" class="com.example.Bean_Life_Cycle.Customer">
+		<constructor-arg name="firstName" value="Ayman"/>
+		<property name="firstName" value="DevMo"/>
+	</bean> -->
+
 
 </beans>
