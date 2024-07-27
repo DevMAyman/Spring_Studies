@@ -7,7 +7,7 @@
                            https://www.springframework.org/schema/beans/spring-beans.xsd
                            http://www.springframework.org/schema/context
                            https://www.springframework.org/schema/context/spring-context.xsd">
-  <context:component-scan base-package="com.example.Bean_Life_Cycle"/>
+  <context:component-scan base-package="com.example.destruction"/>
 
 
 	 <!-- <bean id="custmoerPostBeanProcessor" class="com.example.Bean_Life_Cycle.CustomBeanPostProcessor"/> -->

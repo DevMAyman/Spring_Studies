@@ -5,3 +5,4 @@
 /home/dev_ayman/java_studies/spring_core/my-app/src/main/java/com/example/Bean_Life_Cycle/Customer.java
 /home/dev_ayman/java_studies/spring_core/my-app/src/main/java/com/example/Config/AppConfig.java
 /home/dev_ayman/java_studies/spring_core/my-app/src/main/java/com/example/EmailService.java
+/home/dev_ayman/java_studies/spring_core/my-app/src/main/java/com/example/destruction/CustomerDest.java

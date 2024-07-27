@@ -52,4 +52,9 @@ public class Customer implements BeanNameAware, BeanFactoryAware, ApplicationCon
         this.firstName = "Ayman after property set";
         System.out.println("afterPropertiesSet");
     }
+
+    
+    public void customInit  (){
+            System.out.println("Customer init........");
+    }
 }

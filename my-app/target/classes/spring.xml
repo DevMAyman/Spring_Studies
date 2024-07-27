@@ -11,6 +11,7 @@
 		<constructor-arg name="firstName" value="Ayman"/>
 		<property name="firstName" value="DevMo"/>
 	</bean> -->
+	 <!-- <bean id="custmoerPostBeanProcessor" class="com.example.Bean_Life_Cycle.CustomBeanPostProcessor"/> -->
 
 
 </beans>

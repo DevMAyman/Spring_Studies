@@ -1,5 +1,6 @@
 com/example/App.class
 com/example/Annotations/SMSService.class
+com/example/destruction/CustomerDest.class
 com/example/Config/AppConfig.class
 com/example/Annotations/MyAppConfig.class
 com/example/Bean_Life_Cycle/Customer.class

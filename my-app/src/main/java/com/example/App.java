@@ -2,6 +2,7 @@ package com.example;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import com.example.Annotations.MyAppConfig;
@@ -50,6 +51,7 @@ public class App
         // ApplicationContext appContext  = new ClassPathXmlApplicationContext("spring.xml");
         // String firstName = appContext.getBean("cust", Customer.class).getFirstName();
         // System.out.println("firstName" + firstName);
-        ApplicationContext context2 = new ClassPathXmlApplicationContext("spring-annotations.xml");
+        ApplicationContext context2 = new AnnotationConfigApplicationContext("my-app/src/main/resources/spring-annotations.xml");
+        ((AbstractApplicationContext)context2).registerShutdownHook();
     }
 }
