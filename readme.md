@@ -456,3 +456,624 @@ Modifiy Schema location for Namespace `xsi:schemaLocation` as shown below
 
 
 ## Spring Bean Lifecycle (Creation)
+
+![alt text](image-10.png)
+
+- If you want add customized code during beans creation.
+
+### 1- Implement Aware Interfaces.
+- To rebulid maven 
+
+### 2- Implemet IntialzingBean Interface.
+### 3- Custom-Init method
+### 4- @PostConstructor and `@PreDestroy`
+
+## Spring Bean Lifecycle (Destruction)
+![alt text](image-12.png)
+
+
+## Spring Bean Lifecycle - In code
+
+#### 1- Instanciate 
+- If  you want not to call non-argument ctor and call another one, you must make that explicitly.
+DisposableBean
+- We need call this non-args ctor.
+```java
+public Customer(String firstName) {
+        System.out.println("First Name Ctor");
+        this.firstName = firstName;
+    }
+```
+- in xml
+```xml
+<bean id="cust" class="com.example.Bean_Life_Cycle.Customer">
+		<constructor-arg name="firstName" value="Ayman"/>
+	</bean>
+```
+
+#### 2- Populate
+
+- If you want call the property setter
+
+```xml
+<bean id="cust" class="com.example.Bean_Life_Cycle.Customer">
+		<constructor-arg name="firstName" value="Ayman"/>
+		<property name="firstName" value="DevMo"/>
+	</bean>
+```
+#### 3- BeansNameAware
+
+```java
+package com.example.Bean_Life_Cycle;
+
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.BeanFactoryAware;
+import org.springframework.beans.factory.BeanNameAware;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+
+public class Customer implements BeanNameAware,BeanFactoryAware, ApplicationContextAware {
+    
+    private String firstName;
+
+    public Customer() {
+        System.out.println("non-args ctor");
+    }
+
+    public Customer(String firstName) {
+        System.out.println("First Name Ctor");
+        this.firstName = firstName;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        System.out.println("Set First Name");
+        this.firstName = firstName;
+    }
+
+    @Override
+    public void setBeanName(String name) {
+        System.out.println("setBeanName" + name);
+    }
+
+    @Override
+    public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
+        System.out.println("setBeanFactoy" + beanFactory.isSingleton(("cust")));
+    }
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        System.out.println("setApplicationContext"+ applicationContext.isPrototype("cust"));
+    }
+}
+```
+
+#### 4- IntializingBean Interface
+
+```java
+package com.example.Bean_Life_Cycle;
+
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.BeanFactoryAware;
+import org.springframework.beans.factory.BeanNameAware;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+
+public class Customer implements BeanNameAware,BeanFactoryAware, ApplicationContextAware, InitializingBean {
+    
+    private String firstName;
+
+    public Customer() {
+        System.out.println("non-args ctor");
+    }
+
+    public Customer(String firstName) {
+        System.out.println("First Name Ctor");
+        this.firstName = firstName;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        System.out.println("Set First Name" + firstName);
+        this.firstName = firstName;
+    }
+
+    @Override
+    public void setBeanName(String name) {
+        System.out.println("setBeanName" + name);
+    }
+
+    @Override
+    public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
+        System.out.println("setBeanFactoy" + beanFactory.isSingleton(("cust")));
+    }
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        System.out.println("setApplicationContext"+ applicationContext.isPrototype("cust"));
+    }
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        this.firstName = "Ayman after property set";
+    }
+}
+```
+
+
+
+#### 5- BeanPostProcessor Interface
+ - You will create another class. You will not implement BeanPostProcessor.
+
+ ```java
+ package com.example.Bean_Life_Cycle;
+
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.config.BeanPostProcessor;
+
+public class CustomBeanPostProcessor implements BeanPostProcessor {
+    @Override
+	public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
+        System.out.println("postProcessBeforeInitialization" + beanName);
+		return bean;
+	}
+    @Override
+	public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+        System.out.println("postProcessAfterInitialization" + beanName);
+        return bean;
+	}
+}
+ ```
+- Second step you have to register it.
+- You have **Two ways to register**
+
+##### 1- First Way using xml tag 
+```xml
+ 	 <bean id="custmoerPostBeanProcessor" class="com.example.Bean_Life_Cycle.CustomBeanPostProcessor"/>
+```
+ ```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+                           https://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://www.springframework.org/schema/context
+                           https://www.springframework.org/schema/context/spring-context.xsd">
+  <context:component-scan base-package="com.example.Bean_Life_Cycle"/>
+
+
+	 <bean id="custmoerPostBeanProcessor" class="com.example.Bean_Life_Cycle.CustomBeanPostProcessor"/>
+
+</beans>
+```
+
+
+##### 2- Second Way using annotation with xml 
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+                           https://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://www.springframework.org/schema/context
+                           https://www.springframework.org/schema/context/spring-context.xsd">
+  <context:component-scan base-package="com.example.Bean_Life_Cycle"/>
+
+
+	 <!-- <bean id="custmoerPostBeanProcessor" class="com.example.Bean_Life_Cycle.CustomBeanPostProcessor"/> -->
+
+</beans>
+```
+- Using `@Component` annotation with the `CustomBeanPostProcess` class
+
+```java
+package com.example.Bean_Life_Cycle;
+
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.config.BeanPostProcessor;
+
+@Component
+public class CustomBeanPostProcessor implements BeanPostProcessor {
+    @Override
+	public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
+        System.out.println("postProcessBeforeInitialization" + beanName);
+		return bean;
+	}
+    @Override
+	public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+        System.out.println("postProcessAfterInitialization" + beanName);
+        return bean;
+	}
+}
+```
+
+#### 1- DisposableBean Interface
+
+```java
+package com.example.destruction;
+
+import org.springframework.beans.factory.DisposableBean;
+
+public class CustomerDest implements DisposableBean{
+
+    @Override
+    public void destroy() throws Exception {
+        System.out.println("DisposableBean");
+    }
+    
+}
+```
+- You must shut down the ApplicationContext that holds that bean to call destroy method.
+
+```java
+package com.example;
+
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.support.AbstractApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+import com.example.Annotations.MyAppConfig;
+import com.example.Annotations.SMSService;
+import com.example.Bean_Life_Cycle.Customer;
+import com.example.Config.AppConfig;
+
+/**
+ * Hello world!
+ *
+ */
+public class App 
+{
+    public static void main( String[] args )
+    {
+        ApplicationContext context2 = new ClassPathXmlApplicationContext("spring-annotations.xml");
+       
+        ((AbstractApplicationContext)context2).registerShutdownHook();
+    }
+}
+```
+
+#### 2- Custom Destroy Method
+- This is best method to overload as it is not coupled to my bean.
+-As You will not implement interface for this method
+
+##### 1- Define your function inside your bean class -You will not need to implement method-
+
+```java
+package com.example.destruction;
+
+import org.springframework.beans.factory.DisposableBean;
+
+public class CustomerDest implements DisposableBean{
+
+    @Override
+    public void destroy() throws Exception {
+        System.out.println("DisposableBean");
+    }
+
+    public void customDestroy(){
+        System.out.println("Custom Destroy");
+    }
+    
+}
+```
+
+##### 2- Register your function -Like you register your init function-
+
+```xml
+	 <bean id="customerDest" class="com.example.Bean_Life_Cycle.CustomDest" destroy-method="customDestroy"/>
+```
+
+##### 3- Shutdown your container
+
+#### 2- Custom Destroy Method (Using annotation)
+
+- Instead register desreoy using attribute `destroy-method` use this annotation `PreDestroy`
+```java
+ @PreDestroy
+    public void customDestroy(){
+        System.out.println("Custom Destroy");
+    }
+```
+- Take care that in way `PreDestroy` annotation the order will be reversed it will 
+
+`ShtdownDown IoC` -> `PreDestroy` -> `DisposableBean`
+
+- Take care that IoC will not destroy `Prototype Scope's Bean` as IoCinitialize prototype and then not keep its refernce inside container as it is too many references may be.
+
+### Java Config
+
+- You can use app config to register customInit and customDestroy.
+
+- If you open `@Bean` class annotation will find that you can use it to register these two function.
+
+```java
+@Target({ElementType.METHOD, ElementType.ANNOTATION_TYPE})
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+public @interface Bean {
+
+	/**
+	 * Alias for {@link #name}.
+	 * <p>Intended to be used when no other attributes are needed, for example:
+	 * {@code @Bean("customBeanName")}.
+	 * @since 4.3.3
+	 * @see #name
+	 */
+	@AliasFor("name")
+	String[] value() default {};
+
+	@AliasFor("value")
+	String[] name() default {};
+
+	boolean autowireCandidate() default true;
+
+	String initMethod() default "";
+
+	String destroyMethod() default AbstractBeanDefinition.INFER_METHOD;
+
+}
+```
+- In my bean class i will define this `customDestroy` or `customInit` function
+
+```java
+ public void customInit  (){
+            System.out.println("Customer init........");
+    }
+```
+
+- In `AppConfig` you can register using `@Bean` annotations.
+
+```java
+@Configuration
+@ComponentScan({"com.example.destruction"})
+public class AppConfig {
+    @Bean(initMethod= "customMethod")
+    public Customer customer(){return new Customer();}
+}
+```
+- **Or You can use `ComponentScan`** with `@PostConstruct` annotation above customInit method
+
+
+### Bean AutoWiring
+- It is very logic taht your classes in your project needing to be interconnected to eachothers.
+- And maybe some bean depen on another one. How we resolce that?
+- We need Spring resolve and inject this bean to another one this behaviour is done by spring `autowiring` `wiring`
+- Look at below image and see how objects are wired together. It is complex. is not it?
+- `AutoWiring` will solve this away from us
+![alt text](image-13.png)
+- There are `Four` type for this `Autwiring`
+
+##### 1- no
+- Spring does not do dependancy injection automatically for you. Instead  you have to wire this bean by yourself by **XML** 
+
+
+##### 2- byName
+- It will match based on property name and bean name
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+                           https://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://www.springframework.org/schema/context
+                           https://www.springframework.org/schema/context/spring-context.xsd">
+        <bean id="customerService" class="main.java.com.customer.CustomerService" autowire="byName"></bean>
+        <bean id="customerDao" class="main.java.com.customer.CustomerDao"></bean>
+    
+</beans>
+```
+
+```java
+package main.java.com.customer;
+
+public class CustomerService {
+    
+    private CustomerDao customerDao;
+
+    public CustomerService() {
+        System.out.println("default ctor");
+    }
+    public CustomerDao getCustomerDao(){
+        return customerDao;
+    }
+
+    public void setCustomerDao(CustomerDao customerDao){
+        System.out.println("SetCustomerDaoter");
+        this.customerDao = customerDao;
+    }
+}
+```
+
+-Do not forget to implement setter method for dependancy as it will be used by `autowire`
+
+- Now bean will look at **the name** this dependancy `private CustomerDao customerDao` and try to find another bean in its container with this name `with id`
+
+##### 3- byType -Default in java config-
+- Find one bean with the same type of the property
+```xml
+<bean id="customerService" class="main.java.com.customer.CustomerService" autowire="byType"></bean>
+```
+- Search for any bean of type `CustomerDao`.
+- **I think you notice the issue here "What if i hava more than bean of the same type and my class depend on that class?"**
+- You will have exception, You must have one
+
+##### 4- Ctor : byType
+- Like the`byType`
+<bean id="customerService" class="main.java.com.customer.CustomerService" autowire="constructor"></bean>
+```
+- But must find customized ctor  for instanciate dependancey using ctor not from setter and if you does not make customized ctor to instanciate the dependancy and using setter like `byType` it will work no execption will be but dependancy will not be resolved
+
+```java
+ public CustomerService(CustomerDao customerDao) {
+        this.customerDao = customerDao;
+    }
+```
+- But unlike `byType` If you have more than one bean, it will not throw exception instead dependancy will not been resolved, but if the same of argument in ctor the same as one in id of that bean it will resolved. **That is difference between `byType` and `construcor` `autowiring`**
+
+### AutoWired annotation
+
+#### 1- Property based dependancy injection
+- Annotate Service class with `@Service`
+- Annotate property dependant with `@AutoWired`
+```java
+package main.java.com.customer;
+import org.springframework.stereotype.Service;
+
+
+@Service
+public class CustomerService {
+    
+    @Autowired
+    private CustomerDao customerDao;
+
+
+    public CustomerDao getCustomerDao(){
+        return customerDao;
+    }
+
+   
+}
+```
+- Tell AppConfig to scan for component annotation or any other its subAnnotation `@Service` `@Repository`
+```java
+package main.java.com.customer;
+
+@Configuration
+@ComponentScan("main.java.com.customer")
+public class AppConfig {
+    
+}
+```
+- Annotate dependant class with `@Repository`.
+```java
+package main.java.com.customer;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public class CustomerDao {
+    
+}
+```
+
+- **This type may be led to circle dependancy issue, you will need using mockito to unit testing**
+
+
+#### 2- Setter Based dependancy injection
+```java
+package main.java.com.customer;
+import org.springframework.stereotype.Service;
+
+
+@Service
+public class CustomerService {
+    
+    private CustomerDao customerDao;
+
+    public CustomerService() {
+        System.out.println("default ctor");
+    }
+    public CustomerDao getCustomerDao(){
+        return customerDao;
+    }
+
+    @Autowired
+    public void setCustomerDao(CustomerDao customerDao){
+        System.out.println("SetCustomerDaoter");
+        this.customerDao = customerDao;
+    }
+}
+```
+
+- As setter is public, `setter based dependancy injection` not widely use as it violate encapuslation issue.
+
+- Setter is `good` at `Circle dependancy`
+
+#### 3- Constructor Based dependancy injection (Best for testing -Junit-)
+
+```java
+//  @Autowired
+    public CustomerService(CustomerDao customerDao) {
+        this.customerDao = customerDao;
+
+    }
+```
+- If can not use `@Autowired` in `constructor based`
+- If you have `default ctor` spring will use default one, but if you want to use another custom one use `@Autoweired`
+
+- ByDefault `@Autowired` is used `byType`, What if i have multiple instance `Beans` of same dependant class.
+
+### Bean Conflict `@Qualifier`
+- Now we have two implementations for `CustomerDao`.
+
+- As you have two implenentaion at same scanned package for same type -interface- `CustomerDao`
+
+-If you run, execption will be thrown.
+`expected at least 1 bean which qualifies as autowire candidate`
+
+- In prooerty based you must annotate one of implementaions at least as `@Repository`.
+
+- Uou must Qualifiy one of them in service class 
+
+```java
+package com.customer;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
+
+
+@Service
+public class CustomerService {
+    //! Default name, first name is lowercase but you can give repository custom name
+    @Qualifier("customerDaoImpl")
+    private CustomerDao customerDao;
+
+    public CustomerService() {
+        System.out.println("default ctor");
+    }
+
+    // @Autowired
+    public CustomerService(CustomerDao customerDao) {
+        this.customerDao = customerDao;
+
+    }
+
+    public CustomerDao getCustomerDao(){
+        return customerDao;
+    }
+
+    public void setCustomerDao(CustomerDao customerDao){
+        System.out.println("SetCustomerDaoter");
+        this.customerDao = customerDao;
+    }
+}
+```
+
+### @Component vs @Bean
+
+- `@Component` annotation has variations `@Service` `@Controller` `@Repository` and `@RestController`
+
+- #### 1- `@Component` based annotation 
+Apply on the class level, there is an implicit one-to-one mapping between bean name and bean, container will have one instance and its name default name
+
+- #### 2- `@Bean` based annotaion
+- Applying on method at `AppConfig`.
+- The bean name is the method name.
+
+### `@Configuration` Annotation.
